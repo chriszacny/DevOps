@@ -1,4 +1,4 @@
 DevOps
 ======
 
-Python package that provides object-oriented devops-related tasks in addition to workflow management.
+Python package that provides a basis for an object-oriented "devops" operational framework.
