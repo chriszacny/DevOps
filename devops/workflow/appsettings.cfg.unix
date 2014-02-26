@@ -1,0 +1,5 @@
+[Default]
+logDirectory = /Users/someuser/devops/logs
+
+[SourceControl]
+git = /usr/bin/git

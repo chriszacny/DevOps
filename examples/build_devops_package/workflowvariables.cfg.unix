@@ -1,0 +1,7 @@
+[Default]
+distributionRootDirectory = dist.test
+sourceDistributionDirectory = dist.test/DevOps
+localGitRepo = dist.test
+remoteGitRepo = ssh://
+pythonLocation = /usr/bin/python
+
