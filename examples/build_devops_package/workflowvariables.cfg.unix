@@ -2,6 +2,6 @@
 distributionRootDirectory = dist.test
 sourceDistributionDirectory = dist.test/DevOps
 localGitRepo = dist.test
-remoteGitRepo = ssh://
+remoteGitRepo = https://github.com/chriszacny/DevOps.git
 pythonLocation = /usr/bin/python
 
