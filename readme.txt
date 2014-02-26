@@ -18,7 +18,7 @@ where:
 %PATH_TO_EXTRACTION_DIRECTORY% is the directory path to where the pacakge was extracted.
 
 
-Post install:
+Post Install
 ============================
 Configure the log output directory in appsettings.cfg. If installed via setup.py, this should be in something like:
 
