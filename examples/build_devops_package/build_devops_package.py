@@ -5,8 +5,8 @@ In this example, some basic filesystem tasks are utilized to build the devops di
 import os
 from devops.workflow.workflow import *
 from devops.workflow.core import *
-import devops.workflow.tasks.git
-import devops.workflow.tasks.system
+from devops.workflow.tasks.git import *
+from devops.workflow.tasks.system import *
 
 
 def get_configuration_data(variable_config):
@@ -31,14 +31,22 @@ def get_configuration_data(variable_config):
 @basic_logging_configuration_setup('BuildDevOpsPackage.log')
 @variable_config
 def main(variable_config):
-    configuration_data = get_configuration_data(variable_config)
+    config = get_configuration_data(variable_config)
 
     workflow = MainSequence()
-    setup_dir_conditional = IfElse(os.path.exists(configuration_data['distribution_root_directory']))
-    setup_dir_conditional.add_true_handler('Clean Distribution Directory.', devops.workflow.tasks.system.Delete(configuration_data['distribution_root_directory'], fail_on_error=True))
-    setup_dir_conditional.add_true_handler('Make Distribution Directory.', devops.workflow.tasks.system.MakeDirectory(configuration_data['distribution_root_directory']))
-    setup_dir_conditional.add_false_handler('Make Distribution Directory.', devops.workflow.tasks.system.MakeDirectory(configuration_data['distribution_root_directory']))
+
+    setup_dir_conditional = IfElse(os.path.exists(config['distribution_root_directory']))
+    setup_dir_conditional.add_true_handler('Clean Distribution Directory.', Delete(config['distribution_root_directory'], fail_on_error=True))
+    make_dist_dir = 'Make Distribution Directory.', MakeDirectory(config['distribution_root_directory'])
+    setup_dir_conditional.add_true_handler(make_dist_dir[0], make_dist_dir[1])
+    setup_dir_conditional.add_false_handler(make_dist_dir[0], make_dist_dir[1])
+
     workflow.addstep('If Distribution Directory is Not Empty, Clean it. Else, Create Empty Distribution Directory.', setup_dir_conditional)
-    workflow.addstep('Get Source Code From Git', devops.workflow.tasks.git.Clone(configuration_data['remote_git_repo'], configuration_data['local_git_repo']))
-    workflow.addstep('Build Distribution Using setuptools', devops.workflow.tasks.system.ExecuteCommand([configuration_data['python_location'], configuration_data['setup_py_abs_path'] , 'sdist'], working_directory=configuration_data['source_distribution_directory']))
+    workflow.addstep('Get Source Code From Git', Clone(config['remote_git_repo'], config['local_git_repo']))
+
+    python_location = config['python_location']
+    setup_py_path = config['setup_py_abs_path']
+    working_dir=config['source_distribution_directory']
+    workflow.addstep('Build Distribution Using setuptools', ExecuteCommand([python_location, setup_py_path, 'sdist'], working_directory=working_dir))
+
     workflow.execute()
