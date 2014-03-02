@@ -26,27 +26,34 @@ def get_configuration_data(variable_config):
     return configuration_data
 
 
+def get_setup_dir_conditional(config):
+    setup_dir_conditional = IfElse(os.path.exists(config['distribution_root_directory']))
+    make_dist_dir = 'Make Distribution Directory.', MakeDirectory(config['distribution_root_directory'])
+
+    setup_dir_conditional.add_true_handler('Clean Distribution Directory.',
+                                           Delete(config['distribution_root_directory'],
+                                                  fail_on_error=True))
+    setup_dir_conditional.add_true_handler(make_dist_dir[0], make_dist_dir[1])
+    setup_dir_conditional.add_false_handler(make_dist_dir[0], make_dist_dir[1])
+
+    return setup_dir_conditional
+
+
 @entry_point
 @colorize_output
 @basic_logging_configuration_setup('BuildDevOpsPackage.log')
 @variable_config
 def main(variable_config):
     config = get_configuration_data(variable_config)
+    setup_dir_conditional = get_setup_dir_conditional(config)
 
     workflow = MainSequence()
 
-    setup_dir_conditional = IfElse(os.path.exists(config['distribution_root_directory']))
-    setup_dir_conditional.add_true_handler('Clean Distribution Directory.', Delete(config['distribution_root_directory'], fail_on_error=True))
-    make_dist_dir = 'Make Distribution Directory.', MakeDirectory(config['distribution_root_directory'])
-    setup_dir_conditional.add_true_handler(make_dist_dir[0], make_dist_dir[1])
-    setup_dir_conditional.add_false_handler(make_dist_dir[0], make_dist_dir[1])
-
     workflow.addstep('If Distribution Directory is Not Empty, Clean it. Else, Create Empty Distribution Directory.', setup_dir_conditional)
     workflow.addstep('Get Source Code From Git', Clone(config['remote_git_repo'], config['local_git_repo']))
-
-    python_location = config['python_location']
-    setup_py_path = config['setup_py_abs_path']
-    working_dir=config['source_distribution_directory']
-    workflow.addstep('Build Distribution Using setuptools', ExecuteCommand([python_location, setup_py_path, 'sdist'], working_directory=working_dir))
+    workflow.addstep('Build Distribution Using setuptools',
+                     ExecuteCommand([config['python_location'],
+                                     config['setup_py_abs_path'], 'sdist'],
+                                    working_directory=config['source_distribution_directory']))
 
     workflow.execute()

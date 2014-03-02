@@ -17,12 +17,11 @@ import logging
 import collections
 import sys
 import traceback
+from .core import get_system_config_value
 from abc import ABCMeta, abstractmethod
 
 import colorama
 
-
-INDENTATION="     "
 
 class WorkflowTask(object):
 
@@ -144,16 +143,16 @@ class WorkflowTask(object):
         """
 
         if textstyle == WorkflowTask.TextStyle.Text or textstyle == WorkflowTask.TextStyle.Error:
-            return INDENTATION * (self._get_indentation_level() + 1)
+            return eval(get_system_config_value('ConsoleOutput', 'indentation')) * (self._get_indentation_level() + 1)
         else:
-            return INDENTATION * self._get_indentation_level()
+            return eval(get_system_config_value('ConsoleOutput', 'indentation')) * self._get_indentation_level()
 
     def _get_error_style(self):
         """
         Sets the output (console, logging, etc) error style of a WorkflowTask (if Exceptions are raised). It is not required to be implementd by subclasses as it has a default implementation, but feel free to override that.
         """
 
-        return colorama.Back.RED + colorama.Fore.WHITE
+        return eval(get_system_config_value('ConsoleOutput', 'workflowTaskErrorStyle'))
 
     def _w_print(self, text, textstyle=TextStyle.Text, loglevel=logging.INFO):
         """
@@ -202,13 +201,13 @@ class DevOpsTask(WorkflowTask):
         super().__init__()
 
     def _get_header_style(self):
-        return colorama.Fore.WHITE + colorama.Style.DIM
+        return eval(get_system_config_value('ConsoleOutput', 'devOpsTaskHeaderStyle'))
 
     def _get_footer_style(self):
-        return colorama.Fore.WHITE
+        return eval(get_system_config_value('ConsoleOutput', 'devOpsTaskFooterStyle'))
 
     def _get_text_style(self):
-        return colorama.Fore.GREEN + colorama.Style.DIM
+        return eval(get_system_config_value('ConsoleOutput', 'devOpsTaskTextStyle'))
 
     def _prehook(self):
         self._w_print('Starting ==> {}'.format(self.step_name), WorkflowTask.TextStyle.Header)
@@ -229,13 +228,13 @@ class ControlFlowTask(WorkflowTask):
         super().__init__()
 
     def _get_header_style(self):
-        return colorama.Fore.YELLOW + colorama.Style.DIM
+        return eval(get_system_config_value('ConsoleOutput', 'controlFlowTaskHeaderStyle'))
 
     def _get_footer_style(self):
-        return colorama.Fore.YELLOW
+        return eval(get_system_config_value('ConsoleOutput', 'controlFlowTaskFooterStyle'))
 
     def _get_text_style(self):
-        return colorama.Fore.YELLOW + colorama.Style.DIM
+        return eval(get_system_config_value('ConsoleOutput', 'controlFlowTaskTextStyle'))
 
     def _prehook(self, style=''):
         self._w_print('Starting ==> {}'.format(self.step_name), WorkflowTask.TextStyle.Header)
@@ -265,13 +264,13 @@ class Sequence(WorkflowTask):
         self.parent = parent
 
     def _get_header_style(self):
-        return colorama.Back.BLUE + colorama.Fore.CYAN
+        return eval(get_system_config_value('ConsoleOutput', 'sequenceHeaderStyle'))
 
     def _get_footer_style(self):
-        return colorama.Back.BLUE + colorama.Fore.CYAN
+        return eval(get_system_config_value('ConsoleOutput', 'sequenceFooterStyle'))
 
     def _get_text_style(self):
-        return colorama.Fore.CYAN + colorama.Style.DIM
+        return eval(get_system_config_value('ConsoleOutput', 'sequenceTextStyle'))
 
     def execute(self, step_name='', existing_variables=None):
         """
