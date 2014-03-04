@@ -3,5 +3,5 @@ distributionRootDirectory = dist.test
 sourceDistributionDirectory = dist.test
 localGitRepo = dist.test
 remoteGitRepo = https://github.com/chriszacny/DevOps.git
-pythonLocation = /usr/bin/python
+pythonLocation = /Users/chris/Development/Python3.3.Dev/bin/python
 

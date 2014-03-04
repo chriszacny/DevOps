@@ -9,6 +9,6 @@ setup(name='devops',
       author_email='chris@chriszacny.com',
       url='http://chriszacny.com/projects/',
       packages=['devops', 'devops.workflow', 'devops.workflow.tasks'],
-      package_data={'devops.workflow': ['*.cfg']},
+      package_data={'devops.workflow': ['*.cfg', '*.cfg.unix']},
       install_requires=['requests', 'xlrd', 'colorama'],
 )
